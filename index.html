@@ -92,155 +92,128 @@
 
     <div class="frame">
       <!-- ========================= ASK SCENE ========================= -->
-      <svg id="askScene" viewBox="0 0 900 450" aria-label="ask scene">
-        <rect x="0" y="0" width="900" height="450" fill="#fff"/>
+      <svg id="askScene" viewBox="0 0 900 450">
 
-        <!-- light hearts -->
-        <g opacity=".12" fill="#111">
-          <path d="M140 110 C120 85, 90 92, 95 122 C102 158, 140 168, 140 198 C140 168, 180 158, 187 122 C192 92, 162 85, 140 110Z"/>
-          <path d="M760 120 C740 95, 710 102, 715 132 C722 168, 760 178, 760 208 C760 178, 800 168, 807 132 C812 102, 782 95, 760 120Z"/>
-        </g>
+<rect width="900" height="450" fill="#ffffff"/>
 
-        <!-- speech box -->
-        <g>
-          <rect x="300" y="38" width="300" height="70" fill="#fff" stroke="#000" stroke-width="8"/>
-          <text x="450" y="84" text-anchor="middle"
-                font-family="system-ui,Segoe UI,Arial"
-                font-weight="950" font-size="28" fill="#000">BE MY VALENTINE?</text>
-        </g>
+<!-- HEARTS -->
+<g fill="#000000" opacity="0.08">
+  <rect x="120" y="120" width="40" height="40"/>
+  <rect x="140" y="100" width="40" height="40"/>
+  <rect x="160" y="120" width="40" height="40"/>
+  <rect x="140" y="140" width="40" height="40"/>
 
-        <!-- ========= YOU (left) - based on green plaid hoodie sprite ========= -->
-        <g id="you" transform="translate(170,130)">
-          <!-- shadow -->
-          <ellipse cx="110" cy="292" rx="78" ry="14" fill="#000" opacity=".08"/>
+  <rect x="720" y="120" width="40" height="40"/>
+  <rect x="740" y="100" width="40" height="40"/>
+  <rect x="760" y="120" width="40" height="40"/>
+  <rect x="740" y="140" width="40" height="40"/>
+</g>
 
-          <!-- legs -->
-          <rect x="76" y="196" width="68" height="104" rx="10" fill="#131313"/>
-          <rect x="78" y="200" width="64" height="96" rx="10" fill="#0d0d0d"/>
+<!-- TITLE BOX -->
+<rect x="300" y="40" width="300" height="70" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+<text x="450" y="85" text-anchor="middle" font-size="28" font-weight="900">BE MY VALENTINE?</text>
 
-          <!-- shoes -->
-          <rect x="56" y="294" width="54" height="22" rx="10" fill="#111"/>
-          <rect x="110" y="294" width="54" height="22" rx="10" fill="#111"/>
+<!-- ================= YOU (LEFT) ================= -->
+<g transform="translate(200,140)">
 
-          <!-- hoodie body -->
-          <rect x="46" y="112" width="128" height="104" rx="20" fill="#6a8e2d"/>
-          <!-- plaid -->
-          <g opacity=".55">
-            <rect x="46" y="140" width="128" height="7" fill="#98c04a"/>
-            <rect x="46" y="170" width="128" height="7" fill="#98c04a"/>
-            <rect x="76" y="112" width="7" height="104" fill="#98c04a"/>
-            <rect x="120" y="112" width="7" height="104" fill="#98c04a"/>
-            <rect x="152" y="112" width="7" height="104" fill="#98c04a"/>
-          </g>
-          <!-- zipper -->
-          <rect x="108" y="112" width="6" height="104" fill="#111"/>
+  <!-- HEAD -->
+  <rect x="40" y="0" width="80" height="80" fill="#f0cfb5"/>
 
-          <!-- sleeves -->
-          <rect x="20" y="126" width="34" height="86" rx="16" fill="#6a8e2d"/>
-          <rect x="166" y="126" width="34" height="86" rx="16" fill="#6a8e2d"/>
+  <!-- SHAGGY HAIR (pixel layered) -->
+  <rect x="30" y="-20" width="100" height="40" fill="#2a0707"/>
+  <rect x="20" y="0" width="20" height="40" fill="#2a0707"/>
+  <rect x="120" y="0" width="20" height="40" fill="#2a0707"/>
+  <rect x="50" y="-30" width="20" height="20" fill="#2a0707"/>
+  <rect x="80" y="-35" width="20" height="20" fill="#2a0707"/>
+  <rect x="110" y="-25" width="20" height="20" fill="#2a0707"/>
 
-          <!-- hands -->
-          <rect x="26" y="204" width="24" height="22" rx="7" fill="#f0cfb5"/>
-          <rect x="170" y="204" width="24" height="22" rx="7" fill="#f0cfb5"/>
+  <!-- EYES -->
+  <rect x="60" y="30" width="12" height="12" fill="#000"/>
+  <rect x="98" y="30" width="12" height="12" fill="#000"/>
+  <rect x="64" y="34" width="4" height="4" fill="#fff"/>
+  <rect x="102" y="34" width="4" height="4" fill="#fff"/>
 
-          <!-- chain -->
-          <g opacity=".85" fill="#777">
-            <circle cx="78" cy="210" r="3"/><circle cx="70" cy="218" r="3"/>
-            <circle cx="62" cy="226" r="3"/><circle cx="54" cy="234" r="3"/>
-          </g>
+  <!-- SMILE -->
+  <rect x="75" y="55" width="20" height="6" fill="#000"/>
 
-          <!-- head -->
-          <rect x="64" y="18" width="92" height="92" rx="28" fill="#f0cfb5"/>
-          <!-- blush -->
-          <rect x="78" y="72" width="16" height="7" rx="3" fill="#ff9fb0" opacity=".55"/>
-          <rect x="126" y="72" width="16" height="7" rx="3" fill="#ff9fb0" opacity=".55"/>
+  <!-- BLUSH -->
+  <rect x="52" y="48" width="12" height="6" fill="#ff9fb0"/>
+  <rect x="108" y="48" width="12" height="6" fill="#ff9fb0"/>
 
-          <!-- eyes -->
-          <rect x="84" y="48" width="18" height="16" rx="7" fill="#111"/>
-          <rect x="118" y="48" width="18" height="16" rx="7" fill="#111"/>
-          <rect x="90" y="52" width="6" height="6" rx="3" fill="#fff" opacity=".85"/>
-          <rect x="124" y="52" width="6" height="6" rx="3" fill="#fff" opacity=".85"/>
+  <!-- HOODIE -->
+  <rect x="20" y="80" width="120" height="100" fill="#6a8e2d"/>
 
-          <!-- mouth -->
-          <path d="M96 84 Q110 96 124 84" fill="none" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+  <!-- PLAID -->
+  <rect x="20" y="110" width="120" height="6" fill="#98c04a"/>
+  <rect x="20" y="140" width="120" height="6" fill="#98c04a"/>
+  <rect x="60" y="80" width="6" height="100" fill="#98c04a"/>
+  <rect x="100" y="80" width="6" height="100" fill="#98c04a"/>
 
-          <!-- hair (dark red/black messy) -->
-          <path d="M62 44
-                   C64 10, 98 -6, 136 4
-                   C162 10, 170 32, 160 52
-                   C150 72, 130 78, 110 78
-                   C86 78, 66 70, 62 44Z"
-                fill="#2a0707"/>
-          <g fill="#2a0707">
-            <rect x="70" y="10" width="12" height="22" rx="5"/>
-            <rect x="86" y="4" width="12" height="26" rx="5"/>
-            <rect x="102" y="0" width="12" height="28" rx="5"/>
-            <rect x="118" y="4" width="12" height="26" rx="5"/>
-            <rect x="134" y="10" width="12" height="22" rx="5"/>
-          </g>
-        </g>
+  <!-- ZIPPER -->
+  <rect x="78" y="80" width="6" height="100" fill="#000"/>
 
-        <!-- ========= HER (right) - based on black outfit photo ========= -->
-        <g id="her" transform="translate(560,120)">
-          <!-- shadow -->
-          <ellipse cx="115" cy="304" rx="78" ry="14" fill="#000" opacity=".08"/>
+  <!-- ARMS -->
+  <rect x="0" y="100" width="20" height="70" fill="#6a8e2d"/>
+  <rect x="140" y="100" width="20" height="70" fill="#6a8e2d"/>
 
-          <!-- legs -->
-          <rect x="92" y="210" width="32" height="110" rx="10" fill="#1a1a1a"/>
-          <rect x="128" y="210" width="32" height="110" rx="10" fill="#1a1a1a"/>
+  <!-- HANDS -->
+  <rect x="0" y="160" width="20" height="20" fill="#f0cfb5"/>
+  <rect x="140" y="160" width="20" height="20" fill="#f0cfb5"/>
 
-          <!-- boots -->
-          <rect x="84" y="312" width="50" height="24" rx="10" fill="#111"/>
-          <rect x="120" y="312" width="50" height="24" rx="10" fill="#111"/>
+  <!-- PANTS -->
+  <rect x="50" y="180" width="60" height="100" fill="#111"/>
 
-          <!-- skirt -->
-          <path d="M70 200 C90 176, 140 176, 160 200 L170 245 C150 260, 80 260, 60 245 Z" fill="#111"/>
+  <!-- SHOES -->
+  <rect x="40" y="280" width="40" height="20" fill="#000"/>
+  <rect x="90" y="280" width="40" height="20" fill="#000"/>
 
-          <!-- top -->
-          <rect x="62" y="112" width="176" height="92" rx="20" fill="#111"/>
-          <!-- lace-ish dots (super subtle) -->
-          <g opacity=".10" fill="#fff">
-            <circle cx="90" cy="136" r="3"/><circle cx="112" cy="150" r="3"/><circle cx="138" cy="140" r="3"/>
-            <circle cx="166" cy="152" r="3"/><circle cx="196" cy="142" r="3"/><circle cx="218" cy="156" r="3"/>
-          </g>
+</g>
 
-          <!-- sleeves -->
-          <rect x="36" y="120" width="34" height="86" rx="14" fill="#111"/>
-          <rect x="230" y="120" width="34" height="86" rx="14" fill="#111"/>
+<!-- ================= HER (RIGHT) ================= -->
+<g transform="translate(550,130)">
 
-          <!-- hands -->
-          <rect x="42" y="198" width="22" height="22" rx="7" fill="#d9a77f"/>
-          <rect x="236" y="198" width="22" height="22" rx="7" fill="#d9a77f"/>
+  <!-- HEAD -->
+  <rect x="40" y="0" width="80" height="90" fill="#d9a77f"/>
 
-          <!-- head -->
-          <rect x="104" y="18" width="96" height="100" rx="30" fill="#d9a77f"/>
+  <!-- LONG HAIR (pixel layers, FACE VISIBLE) -->
+  <rect x="20" y="-10" width="120" height="140" fill="#000"/>
+  <rect x="40" y="0" width="80" height="90" fill="#d9a77f"/>
 
-          <!-- eyes -->
-          <rect x="124" y="58" width="18" height="14" rx="6" fill="#111"/>
-          <rect x="160" y="58" width="18" height="14" rx="6" fill="#111"/>
-          <rect x="130" y="62" width="6" height="6" rx="3" fill="#fff" opacity=".85"/>
-          <rect x="166" y="62" width="6" height="6" rx="3" fill="#fff" opacity=".85"/>
+  <!-- EYES -->
+  <rect x="60" y="35" width="12" height="10" fill="#000"/>
+  <rect x="98" y="35" width="12" height="10" fill="#000"/>
+  <rect x="64" y="38" width="4" height="4" fill="#fff"/>
+  <rect x="102" y="38" width="4" height="4" fill="#fff"/>
 
-          <!-- lips -->
-          <rect x="140" y="92" width="26" height="6" rx="3" fill="#111" opacity=".9"/>
+  <!-- LIPS -->
+  <rect x="75" y="60" width="20" height="6" fill="#000"/>
 
-          <!-- hair (long straight) -->
-          <path d="M84 62
-                   C90 18, 142 -4, 206 10
-                   C244 18, 262 48, 252 96
-                   C244 134, 244 200, 252 250
-                   C220 266, 120 266, 76 250
-                   C92 200, 94 132, 84 62Z"
-                fill="#0f0f0f"/>
-          <!-- inner strands -->
-          <path d="M118 52 C118 142, 114 192, 104 240" fill="none" stroke="#111" stroke-width="10" opacity=".25"/>
-          <path d="M210 52 C210 142, 216 192, 230 240" fill="none" stroke="#111" stroke-width="10" opacity=".25"/>
+  <!-- BLACK LACE TOP -->
+  <rect x="20" y="90" width="120" height="80" fill="#111"/>
 
-          <!-- earrings -->
-          <rect x="96" y="78" width="6" height="22" rx="3" fill="#111"/>
-          <rect x="200" y="78" width="6" height="22" rx="3" fill="#111"/>
-        </g>
-      </svg>
+  <!-- SKIRT -->
+  <rect x="40" y="170" width="80" height="80" fill="#111"/>
+
+  <!-- ARMS -->
+  <rect x="0" y="100" width="20" height="60" fill="#111"/>
+  <rect x="140" y="100" width="20" height="60" fill="#111"/>
+
+  <!-- HANDS -->
+  <rect x="0" y="160" width="20" height="20" fill="#d9a77f"/>
+  <rect x="140" y="160" width="20" height="20" fill="#d9a77f"/>
+
+  <!-- LEGS -->
+  <rect x="60" y="250" width="20" height="90" fill="#111"/>
+  <rect x="90" y="250" width="20" height="90" fill="#111"/>
+
+  <!-- SHOES -->
+  <rect x="50" y="340" width="40" height="20" fill="#000"/>
+  <rect x="90" y="340" width="40" height="20" fill="#000"/>
+
+</g>
+
+</svg>
+
 
       <!-- ========================= NO SCENE ========================= -->
       <svg id="noScene" viewBox="0 0 900 450" aria-label="kiki crying" style="display:none;">
@@ -430,3 +403,4 @@
 </script>
 </body>
 </html>
+
