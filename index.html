@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine?</title>
+  <style>
+    :root{
+      --bg:#000;
+      --paper:#fff;
+      --ink:#111;
+      --border:#000;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .paper{
+      width:min(820px, 92vw);
+      background:var(--paper);
+      border:10px solid var(--border);
+      padding:18px 18px 22px;
+    }
+    .top{
+      min-height:420px;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+    .caption{
+      position:absolute;
+      top:10px;
+      left:10px;
+      right:10px;
+      font-size:20px;
+      font-weight:700;
+      text-align:center;
+      letter-spacing:.2px;
+    }
+    .hint{
+      position:absolute;
+      top:44px;
+      left:10px;
+      right:10px;
+      font-size:14px;
+      text-align:center;
+      opacity:.7;
+    }
+    .art{
+      width:min(560px, 88%);
+      height:auto;
+    }
+
+    .buttons{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+      padding:0 40px 8px;
+    }
+    button{
+      border:6px solid #000;
+      background:#fff;
+      padding:18px 10px;
+      font-size:28px;
+      font-weight:800;
+      cursor:pointer;
+      letter-spacing:.8px;
+    }
+    button:active{ transform: translateY(2px); }
+    .status{
+      margin-top:8px;
+      text-align:center;
+      font-size:16px;
+      font-weight:600;
+      min-height:22px;
+    }
+    .tiny{
+      font-size:12px;
+      opacity:.65;
+      text-align:center;
+      margin-top:6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="paper">
+    <div class="top">
+      <div class="caption" id="caption">Will you be my Valentine?</div>
+      <div class="hint" id="hint">click yes or no ↓</div>
+
+      <!-- Scene: ASK -->
+      <svg id="sceneAsk" class="art" viewBox="0 0 700 380" aria-label="doodle ask scene">
+        <!-- hearts (simple) -->
+        <g fill="none" stroke="#111" stroke-width="4" stroke-linecap="round">
+          <path d="M80 70 C70 55, 45 55, 45 80 C45 110, 80 120, 80 140 C80 120, 115 110, 115 80 C115 55, 90 55, 80 70"/>
+          <path d="M620 90 C610 75, 585 75, 585 100 C585 130, 620 140, 620 160 C620 140, 655 130, 655 100 C655 75, 630 75, 620 90"/>
+          <path d="M160 160 C150 145, 125 145, 125 170 C125 200, 160 210, 160 230 C160 210, 195 200, 195 170 C195 145, 170 145, 160 160"/>
+        </g>
+
+        <!-- left person (her) -->
+        <g stroke="#111" stroke-width="6" stroke-linecap="round" fill="none">
+          <circle cx="220" cy="150" r="55"/>
+          <!-- hair (simple) -->
+          <path d="M175 135 C190 110, 255 110, 265 145"/>
+          <path d="M180 160 C190 175, 210 185, 220 185"/>
+          <!-- glasses -->
+          <rect x="195" y="145" width="25" height="18"/>
+          <rect x="225" y="145" width="25" height="18"/>
+          <path d="M220 154 L225 154"/>
+          <!-- body -->
+          <path d="M220 205 L220 300"/>
+          <path d="M220 235 L190 260"/>
+          <path d="M220 235 L250 260"/>
+          <path d="M220 300 L190 350"/>
+          <path d="M220 300 L250 350"/>
+        </g>
+
+        <!-- right person (you) -->
+        <g stroke="#111" stroke-width="6" stroke-linecap="round" fill="none">
+          <circle cx="480" cy="145" r="60"/>
+          <!-- shaggy hair -->
+          <path d="M430 135 C450 95, 520 95, 540 135"/>
+          <path d="M440 125 C450 140, 460 145, 470 150"/>
+          <!-- body -->
+          <path d="M480 205 L480 310"/>
+          <path d="M480 235 L450 270"/>
+          <path d="M480 235 L510 270"/>
+          <path d="M480 310 L450 360"/>
+          <path d="M480 310 L515 360"/>
+        </g>
+
+        <!-- speech text (handwritten vibe) -->
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="800">
+          <text x="355" y="45" font-size="28" text-anchor="middle">BE MY VALENTINE?</text>
+        </g>
+      </svg>
+
+      <!-- Scene: NO (Kiki crying) -->
+      <svg id="sceneNo" class="art" viewBox="0 0 700 380" aria-label="kiki crying" style="display:none;">
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="800">
+          <text x="350" y="55" font-size="30" text-anchor="middle">KIKI WILL BE SAD…</text>
+        </g>
+
+        <!-- crying cactus doodle -->
+        <g stroke="#111" stroke-width="6" stroke-linecap="round" fill="none">
+          <!-- pot -->
+          <path d="M260 300 L440 300 L420 355 L280 355 Z"/>
+          <path d="M250 300 L450 300"/>
+          <!-- cactus ball -->
+          <circle cx="350" cy="210" r="85"/>
+          <!-- spines -->
+          <path d="M350 125 L350 110"/>
+          <path d="M390 135 L402 122"/>
+          <path d="M310 135 L298 122"/>
+          <path d="M420 180 L438 176"/>
+          <path d="M280 180 L262 176"/>
+          <path d="M405 240 L420 248"/>
+          <path d="M295 240 L280 248"/>
+          <!-- face -->
+          <path d="M325 205 L325 205"/>
+          <path d="M375 205 L375 205"/>
+          <path d="M335 245 C350 235, 365 235, 380 245"/>
+          <!-- tears -->
+          <path d="M320 220 L310 250"/>
+          <path d="M380 220 L390 250"/>
+        </g>
+      </svg>
+
+      <!-- Scene: YES (hug + holding Kiki + spines everywhere) -->
+      <svg id="sceneYes" class="art" viewBox="0 0 700 380" aria-label="hugging holding kiki" style="display:none;">
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="800">
+          <text x="350" y="55" font-size="28" text-anchor="middle">YAYYYYY 💘</text>
+        </g>
+
+        <!-- couple hugging -->
+        <g stroke="#111" stroke-width="6" stroke-linecap="round" fill="none">
+          <!-- her -->
+          <circle cx="260" cy="150" r="55"/>
+          <path d="M215 140 C230 115, 295 115, 305 150"/>
+          <rect x="235" y="145" width="25" height="18"/>
+          <rect x="265" y="145" width="25" height="18"/>
+          <path d="M260 205 L260 300"/>
+          <!-- you -->
+          <circle cx="440" cy="145" r="60"/>
+          <path d="M390 135 C410 95, 480 95, 500 135"/>
+          <path d="M440 205 L440 305"/>
+
+          <!-- arms hugging / holding kiki -->
+          <path d="M260 235 C310 255, 330 265, 350 265"/>
+          <path d="M440 235 C390 255, 370 265, 350 265"/>
+
+          <!-- Kiki in middle -->
+          <circle cx="350" cy="245" r="55"/>
+          <path d="M320 300 L380 300 L372 335 L328 335 Z"/>
+
+          <!-- Kiki face -->
+          <path d="M335 240 L335 240"/>
+          <path d="M365 240 L365 240"/>
+          <path d="M342 260 C350 265, 358 265, 366 260"/>
+
+          <!-- spines on both of you (lots of tiny lines) -->
+          <path d="M230 235 L220 230"/>
+          <path d="M245 255 L235 250"/>
+          <path d="M275 265 L268 258"/>
+          <path d="M295 240 L305 235"/>
+          <path d="M430 235 L420 230"/>
+          <path d="M445 255 L435 250"/>
+          <path d="M470 265 L462 258"/>
+          <path d="M495 240 L505 235"/>
+
+          <!-- spines on kiki -->
+          <path d="M350 190 L350 175"/>
+          <path d="M380 200 L392 190"/>
+          <path d="M320 200 L308 190"/>
+          <path d="M395 240 L410 240"/>
+          <path d="M305 240 L290 240"/>
+        </g>
+
+        <!-- hearts -->
+        <g fill="none" stroke="#111" stroke-width="4" stroke-linecap="round">
+          <path d="M120 90 C110 75, 85 75, 85 100 C85 130, 120 140, 120 160 C120 140, 155 130, 155 100 C155 75, 130 75, 120 90"/>
+          <path d="M590 95 C580 80, 555 80, 555 105 C555 135, 590 145, 590 165 C590 145, 625 135, 625 105 C625 80, 600 80, 590 95"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="buttons">
+      <button id="yesBtn">YES</button>
+      <button id="noBtn">NO</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="tiny">made with love + terrible drawing skills</div>
+  </div>
+
+  <script>
+    const herName = "baby";
+    const kikiName = "Kiki";
+
+    const caption = document.getElementById("caption");
+    const hint = document.getElementById("hint");
+    const status = document.getElementById("status");
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+
+    const sceneAsk = document.getElementById("sceneAsk");
+    const sceneNo  = document.getElementById("sceneNo");
+    const sceneYes = document.getElementById("sceneYes");
+
+    let noClicks = 0;
+    const noLines = [
+      `${kikiName} will be sad...`,
+      `${kikiName} is sadder...`,
+      `${kikiName} is crying now...`,
+      `${kikiName} is so sad omg...`,
+      `${kikiName}: "why???"`,
+      `PLEASE 😭`,
+    ];
+
+    function showScene(which){
+      sceneAsk.style.display = "none";
+      sceneNo.style.display = "none";
+      sceneYes.style.display = "none";
+      if(which === "ask") sceneAsk.style.display = "block";
+      if(which === "no")  sceneNo.style.display = "block";
+      if(which === "yes") sceneYes.style.display = "block";
+    }
+
+    noBtn.addEventListener("click", () => {
+      noClicks++;
+      showScene("no");
+      caption.textContent = "pls don't do this 😭";
+      hint.textContent = "";
+      status.textContent = noLines[Math.min(noClicks - 1, noLines.length - 1)];
+
+      // make NO button drift a bit (still amateur but funny)
+      const max = Math.min(90, 10 + noClicks * 7);
+      const dx = Math.round((Math.random()*2 - 1) * max);
+      const dy = Math.round((Math.random()*2 - 1) * (max * 0.4));
+      noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+
+    yesBtn.addEventListener("click", () => {
+      showScene("yes");
+      caption.textContent = `YAYYY 💘`;
+      hint.textContent = "";
+      status.textContent = `we’re holding ${kikiName}… and we’re both covered in spines 😭🌵`;
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      yesBtn.style.opacity = 0.6;
+      noBtn.style.opacity = 0.6;
+      noBtn.style.transform = "none";
+    });
+  </script>
+</body>
+</html>
