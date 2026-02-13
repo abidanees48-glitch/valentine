@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Will you be my Valentine?</title>
+<style>
+  :root{
+    --bg:#000;
+    --paper:#fff;
+    --ink:#111;
+    --px:6; /* pixel size */
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    background:var(--bg);
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  .paper{
+    width:min(980px,95vw);
+    background:var(--paper);
+    border:10px solid #000;
+    padding:18px 18px 22px;
+  }
+  h1{
+    margin:6px 0 2px;
+    text-align:center;
+    font-size:clamp(26px,3.6vw,44px);
+    font-weight:950;
+    color:#000;
+    letter-spacing:.2px;
+  }
+  .sub{
+    text-align:center;
+    margin:0 0 14px;
+    font-weight:800;
+    opacity:.75;
+  }
+  .frame{
+    border:8px solid #000;
+    padding:12px;
+    display:grid;
+    place-items:center;
+    background:#fff;
+  }
+  canvas{
+    width:min(920px,92vw);
+    height:auto;
+    image-rendering: pixelated;
+    border:0;
+  }
+  .buttons{
+    margin-top:16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    padding:0 52px;
+  }
+  button{
+    border:6px solid #000;
+    background:#fff;
+    padding:16px 10px;
+    font-size:30px;
+    font-weight:950;
+    letter-spacing:1px;
+    cursor:pointer;
+    user-select:none;
+  }
+  button:active{ transform: translateY(2px); }
+  .status{
+    margin-top:10px;
+    min-height:28px;
+    text-align:center;
+    font-weight:900;
+    color:#000;
+  }
+  .tiny{
+    margin-top:6px;
+    font-size:12px;
+    opacity:.6;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+  <div class="paper">
+    <h1 id="title">Will you be my Valentine?</h1>
+    <div class="sub" id="subtitle">choose wisely (kiki is watching) 🌵</div>
+
+    <div class="frame">
+      <canvas id="c" width="160" height="78" aria-label="pixel art scene"></canvas>
+    </div>
+
+    <div class="buttons">
+      <button id="yesBtn">YES</button>
+      <button id="noBtn">NO</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="tiny">cute pixel art • minimal colours • kiki supremacy 🌵</div>
+  </div>
+
+<script>
+/* =========================================================
+   Cute Pixel Art Valentine Page (3 Scenes)
+   - ASK: you + her + hearts + prompt
+   - NO: Kiki crying + message (NO button drifts)
+   - YES: you + her hugging holding Kiki + spines
+   Canvas is small (160x78) and scales up with CSS.
+========================================================= */
+
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+const title = document.getElementById("title");
+const subtitle = document.getElementById("subtitle");
+const statusEl = document.getElementById("status");
+
+const yesBtn = document.getElementById("yesBtn");
+const noBtn  = document.getElementById("noBtn");
+
+const W = canvas.width, H = canvas.height;
+
+const C = {
+  white:"#ffffff",
+  ink:"#111111",
+  gray:"#dcdcdc",
+  skin1:"#f0cfb5",     // you
+  skin2:"#d9a77f",     // her
+  hairYou:"#1d0202",   // dark shaggy
+  hairHer:"#0b0b0b",
+  hoodie:"#6a8e2d",
+  hoodie2:"#98c04a",
+  pants:"#111111",
+  cactus:"#3fd277",
+  cactusHi:"#a8ffd3",
+  pot:"#a56b3a",
+  potHi:"#c07c43",
+  tear:"#7aa7ff",
+  blush:"#ff9fb0",
+};
+
+function clear(){
+  ctx.fillStyle = C.white;
+  ctx.fillRect(0,0,W,H);
+}
+
+function px(x,y,w=1,h=1,color=C.ink){
+  ctx.fillStyle = color;
+  ctx.fillRect(x,y,w,h);
+}
+
+function rectOutline(x,y,w,h,color=C.ink){
+  // 1px outline
+  for(let i=0;i<w;i++){ px(x+i,y,1,1,color); px(x+i,y+h-1,1,1,color); }
+  for(let j=0;j<h;j++){ px(x,y+j,1,1,color); px(x+w-1,y+j,1,1,color); }
+}
+
+function textMono(str,x,y,size=1){
+  // tiny pixel text: very simple (blocky)
+  // We'll draw via ctx.fillText but on pixel canvas it still looks pixelated.
+  ctx.fillStyle = C.ink;
+  ctx.font = `${6*size}px system-ui, Arial`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(str, x, y);
+  ctx.textAlign = "left";
+}
+
+function heart(x,y,color=C.gray){
+  // cute pixel heart 7x6
+  const p = [
+    "01100110",
+    "11111111",
+    "11111111",
+    "01111110",
+    "00111100",
+    "00011000",
+  ];
+  for(let j=0;j<p.length;j++){
+    for(let i=0;i<p[j].length;i++){
+      if(p[j][i]==="1") px(x+i,y+j,1,1,color);
+    }
+  }
+}
+
+function drawYou(x,y){
+  // Cute chibi sprite 18x28-ish
+  // head
+  for(let j=0;j<10;j++) for(let i=0;i<10;i++) px(x+4+i,y+1+j,1,1,C.skin1);
+  // hair shaggy
+  for(let i=0;i<12;i++) px(x+3+i,y,1,1,C.hairYou);
+  px(x+2,y+1,1,2,C.hairYou); px(x+15,y+1,1,2,C.hairYou);
+  px(x+5,y-1,1,1,C.hairYou); px(x+8,y-2,1,1,C.hairYou); px(x+11,y-1,1,1,C.hairYou);
+  // eyes
+  px(x+6,y+5,1,1,C.ink); px(x+10,y+5,1,1,C.ink);
+  px(x+6,y+6,1,1,C.white); px(x+10,y+6,1,1,C.white);
+  // blush
+  px(x+5,y+7,1,1,C.blush); px(x+11,y+7,1,1,C.blush);
+  // smile
+  px(x+7,y+8,4,1,C.ink);
+
+  // hoodie (green plaid)
+  for(let j=0;j<9;j++) for(let i=0;i<12;i++) px(x+3+i,y+11+j,1,1,C.hoodie);
+  // plaid lines
+  for(let i=0;i<12;i++){ px(x+3+i,y+14,1,1,C.hoodie2); px(x+3+i,y+17,1,1,C.hoodie2); }
+  for(let j=0;j<9;j++){ px(x+6,y+11+j,1,1,C.hoodie2); px(x+9,y+11+j,1,1,C.hoodie2); }
+  // zipper
+  for(let j=0;j<9;j++) px(x+8,y+11+j,1,1,C.ink);
+
+  // arms
+  for(let j=0;j<6;j++) px(x+2,y+12+j,1,1,C.hoodie);
+  for(let j=0;j<6;j++) px(x+15,y+12+j,1,1,C.hoodie);
+  // hands
+  px(x+2,y+18,1,2,C.skin1);
+  px(x+15,y+18,1,2,C.skin1);
+
+  // pants
+  for(let j=0;j<8;j++) for(let i=0;i<6;i++) px(x+6+i,y+20+j,1,1,C.pants);
+  // shoes
+  for(let i=0;i<4;i++) px(x+5+i,y+28,1,1,C.ink);
+  for(let i=0;i<4;i++) px(x+9+i,y+28,1,1,C.ink);
+
+  // tiny chain dots
+  px(x+5,y+21,1,1,"#777"); px(x+4,y+22,1,1,"#777"); px(x+3,y+23,1,1,"#777");
+}
+
+function drawHer(x,y){
+  // Cute chibi sprite 18x30-ish, long hair + black outfit
+  // hair block behind
+  for(let j=0;j<16;j++) for(let i=0;i<14;i++) px(x+2+i,y+j,1,1,C.hairHer);
+
+  // face (visible!)
+  for(let j=0;j<10;j++) for(let i=0;i<10;i++) px(x+4+i,y+3+j,1,1,C.skin2);
+
+  // hair fringe
+  for(let i=0;i<10;i++) px(x+4+i,y+2,1,1,C.hairHer);
+
+  // eyes
+  px(x+6,y+7,1,1,C.ink); px(x+10,y+7,1,1,C.ink);
+  px(x+6,y+8,1,1,C.white); px(x+10,y+8,1,1,C.white);
+
+  // lips
+  px(x+7,y+10,4,1,C.ink);
+
+  // top (black)
+  for(let j=0;j<9;j++) for(let i=0;i<12;i++) px(x+3+i,y+14+j,1,1,C.ink);
+  // lace specks (super minimal)
+  px(x+5,y+16,1,1,C.white); px(x+9,y+18,1,1,C.white); px(x+12,y+17,1,1,C.white);
+
+  // arms
+  for(let j=0;j<6;j++) px(x+2,y+15+j,1,1,C.ink);
+  for(let j=0;j<6;j++) px(x+15,y+15+j,1,1,C.ink);
+  // hands
+  px(x+2,y+21,1,2,C.skin2);
+  px(x+15,y+21,1,2,C.skin2);
+
+  // skirt
+  for(let j=0;j<7;j++) for(let i=0;i<10;i++) px(x+4+i,y+23+j,1,1,C.ink);
+
+  // legs
+  for(let j=0;j<7;j++) px(x+6,y+30+j,1,1,C.pants);
+  for(let j=0;j<7;j++) px(x+10,y+30+j,1,1,C.pants);
+
+  // shoes
+  for(let i=0;i<4;i++) px(x+5+i,y+37,1,1,C.ink);
+  for(let i=0;i<4;i++) px(x+9+i,y+37,1,1,C.ink);
+
+  // earrings (tiny)
+  px(x+4,y+9,1,2,C.ink);
+  px(x+13,y+9,1,2,C.ink);
+}
+
+function drawKiki(x,y,crying=false){
+  // Cute round cactus in pot (approx 26x28)
+  // pot
+  for(let j=0;j<7;j++) for(let i=0;i<26;i++) px(x+i,y+21+j,1,1,C.pot);
+  for(let i=0;i<26;i++) px(x+i,y+21,1,1,C.potHi);
+
+  // cactus round
+  const r = 12;
+  for(let dy=-r; dy<=r; dy++){
+    for(let dx=-r; dx<=r; dx++){
+      if(dx*dx + dy*dy <= r*r) px(x+13+dx, y+10+dy, 1,1, C.cactus);
+    }
+  }
+  // highlights
+  px(x+10,y+6,1,1,C.cactusHi);
+  px(x+16,y+8,1,1,C.cactusHi);
+  px(x+12,y+14,1,1,C.cactusHi);
+
+  // spines
+  px(x+13,y-1,1,2,C.cactusHi);
+  px(x+3,y+9,2,1,C.cactusHi);
+  px(x+21,y+9,2,1,C.cactusHi);
+  px(x+6,y+16,2,1,C.cactusHi);
+  px(x+18,y+16,2,1,C.cactusHi);
+
+  // face
+  px(x+10,y+10,2,2,C.ink);
+  px(x+16,y+10,2,2,C.ink);
+
+  if(crying){
+    // sad mouth
+    px(x+11,y+17,6,1,C.ink);
+    px(x+11,y+16,1,1,C.ink);
+    px(x+16,y+16,1,1,C.ink);
+    // tears
+    for(let j=0;j<6;j++) px(x+9,y+12+j,1,1,C.tear);
+    for(let j=0;j<6;j++) px(x+19,y+12+j,1,1,C.tear);
+  }else{
+    // smile
+    px(x+11,y+17,6,1,C.ink);
+    px(x+12,y+16,4,1,C.ink);
+  }
+}
+
+function sprinkleSpines(x1,y1,x2,y2,count){
+  for(let i=0;i<count;i++){
+    const x = Math.floor(x1 + Math.random()*(x2-x1));
+    const y = Math.floor(y1 + Math.random()*(y2-y1));
+    px(x,y,1,1,C.cactusHi);
+  }
+}
+
+let scene = "ASK";
+let noCount = 0;
+
+function drawAsk(){
+  clear();
+  // inner border
+  rectOutline(2,2,W-4,H-4,C.ink);
+
+  // title box inside canvas
+  rectOutline(50,6,60,12,C.ink);
+  // fill
+  for(let j=7;j<17;j++) for(let i=51;i<109;i++) px(i,j,1,1,C.white);
+  textMono("BE MY VALENTINE?", 80, 12, 1);
+
+  heart(18,20,C.gray);
+  heart(132,20,C.gray);
+
+  drawYou(38,26);
+  drawHer(112,20);
+
+  // cute center kiki (watching)
+  drawKiki(67,42,false);
+}
+
+function drawNo(){
+  clear();
+  rectOutline(2,2,W-4,H-4,C.ink);
+  textMono("KIKI WILL BE SAD...", 80, 10, 1);
+  heart(18,20,C.gray);
+  heart(132,20,C.gray);
+
+  drawKiki(67,26,true);
+
+  // little wobble marks
+  px(52,26,2,1,C.ink); px(54,24,1,2,C.ink);
+  px(108,26,2,1,C.ink); px(106,24,1,2,C.ink);
+}
+
+function drawYes(){
+  clear();
+  rectOutline(2,2,W-4,H-4,C.ink);
+  textMono("YAYYYY!!!", 80, 10, 1);
+  heart(18,20,C.gray);
+  heart(132,20,C.gray);
+
+  // hugging pose (closer together)
+  drawYou(46,22);
+  drawHer(94,18);
+
+  // kiki between them
+  drawKiki(67,40,false);
+
+  // spines on both (cute chaos)
+  sprinkleSpines(44,40,62,64,18);   // on you
+  sprinkleSpines(98,40,116,64,18);  // on her
+}
+
+function render(){
+  if(scene==="ASK") drawAsk();
+  if(scene==="NO") drawNo();
+  if(scene==="YES") drawYes();
+}
+render();
+
+/* interactions */
+const noLines = [
+  "Kiki will be sad...",
+  "Kiki is sadder...",
+  "Kiki is CRYING now 😭",
+  "pls don’t do this to Kiki...",
+  "Kiki is inconsolable...",
+  "ok that’s enough 😭"
+];
+
+noBtn.addEventListener("click", () => {
+  scene = "NO";
+  noCount++;
+  title.textContent = "you clicked NO 😭";
+  subtitle.textContent = "";
+  statusEl.textContent = noLines[Math.min(noCount-1, noLines.length-1)];
+  render();
+
+  // drift the NO button (still works with pixel vibe)
+  const max = Math.min(150, 10 + noCount * 12);
+  const dx = Math.round((Math.random()*2 - 1) * max);
+  const dy = Math.round((Math.random()*2 - 1) * (max * 0.25));
+  noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+});
+
+yesBtn.addEventListener("click", () => {
+  scene = "YES";
+  title.textContent = "SHE SAID YES 💘";
+  subtitle.textContent = "";
+  statusEl.textContent = "";
+  render();
+
+  yesBtn.disabled = true;
+  noBtn.disabled = true;
+  yesBtn.style.opacity = 0.65;
+  noBtn.style.opacity = 0.65;
+  noBtn.style.transform = "none";
+});
+</script>
+</body>
+</html>
