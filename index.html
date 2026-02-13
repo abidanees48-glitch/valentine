@@ -9,7 +9,6 @@
     --bg:#000;
     --paper:#fff;
     --ink:#111;
-    --px:6; /* pixel size */
   }
   *{box-sizing:border-box}
   body{
@@ -18,7 +17,7 @@
     display:grid;
     place-items:center;
     background:var(--bg);
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   }
   .paper{
     width:min(980px,95vw);
@@ -39,6 +38,7 @@
     margin:0 0 14px;
     font-weight:800;
     opacity:.75;
+    color:#000;
   }
   .frame{
     border:8px solid #000;
@@ -47,12 +47,16 @@
     place-items:center;
     background:#fff;
   }
+  /* Make canvas crisp (NO blur) */
   canvas{
     width:min(920px,92vw);
     height:auto;
     image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
     border:0;
   }
+
   .buttons{
     margin-top:16px;
     display:grid;
@@ -83,6 +87,7 @@
     font-size:12px;
     opacity:.6;
     text-align:center;
+    color:#000;
   }
 </style>
 </head>
@@ -92,6 +97,7 @@
     <div class="sub" id="subtitle">choose wisely (kiki is watching) 🌵</div>
 
     <div class="frame">
+      <!-- IMPORTANT: width/height are integers; canvas is scaled by CSS only -->
       <canvas id="c" width="160" height="78" aria-label="pixel art scene"></canvas>
     </div>
 
@@ -101,335 +107,383 @@
     </div>
 
     <div class="status" id="status"></div>
-    <div class="tiny">cute pixel art • minimal colours • kiki supremacy 🌵</div>
+    <div class="tiny">cute pixel art • crisp edges • kiki supremacy 🌵</div>
   </div>
 
 <script>
-/* =========================================================
-   Cute Pixel Art Valentine Page (3 Scenes)
-   - ASK: you + her + hearts + prompt
-   - NO: Kiki crying + message (NO button drifts)
-   - YES: you + her hugging holding Kiki + spines
-   Canvas is small (160x78) and scales up with CSS.
-========================================================= */
+  // ====== Canvas setup (crisp pixels) ======
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d", { alpha: false });
+  ctx.imageSmoothingEnabled = false;
 
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
+  const W = canvas.width, H = canvas.height;
 
-const title = document.getElementById("title");
-const subtitle = document.getElementById("subtitle");
-const statusEl = document.getElementById("status");
+  const title = document.getElementById("title");
+  const subtitle = document.getElementById("subtitle");
+  const statusEl = document.getElementById("status");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
 
-const yesBtn = document.getElementById("yesBtn");
-const noBtn  = document.getElementById("noBtn");
+  // ====== Palette ======
+  const C = {
+    white:"#ffffff",
+    ink:"#111111",
+    gray:"#dddddd",
+    skinYou:"#f0cfb5",
+    skinHer:"#d9a77f",
+    hairYou:"#1d0202",
+    hairHer:"#0b0b0b",
+    hoodie:"#6a8e2d",
+    hoodie2:"#98c04a",
+    pants:"#111111",
+    cactus:"#3fd277",
+    cactusHi:"#a8ffd3",
+    pot:"#a56b3a",
+    potHi:"#c07c43",
+    tear:"#7aa7ff",
+    blush:"#ff9fb0",
+  };
 
-const W = canvas.width, H = canvas.height;
+  function fill(color){ ctx.fillStyle=color; }
+  function px(x,y,w=1,h=1,color=C.ink){
+    ctx.fillStyle = color;
+    ctx.fillRect(x,y,w,h);
+  }
+  function clear(){
+    fill(C.white);
+    ctx.fillRect(0,0,W,H);
+  }
+  function outline(x,y,w,h,color=C.ink){
+    for(let i=0;i<w;i++){ px(x+i,y,1,1,color); px(x+i,y+h-1,1,1,color); }
+    for(let j=0;j<h;j++){ px(x,y+j,1,1,color); px(x+w-1,y+j,1,1,color); }
+  }
 
-const C = {
-  white:"#ffffff",
-  ink:"#111111",
-  gray:"#dcdcdc",
-  skin1:"#f0cfb5",     // you
-  skin2:"#d9a77f",     // her
-  hairYou:"#1d0202",   // dark shaggy
-  hairHer:"#0b0b0b",
-  hoodie:"#6a8e2d",
-  hoodie2:"#98c04a",
-  pants:"#111111",
-  cactus:"#3fd277",
-  cactusHi:"#a8ffd3",
-  pot:"#a56b3a",
-  potHi:"#c07c43",
-  tear:"#7aa7ff",
-  blush:"#ff9fb0",
-};
+  // Crisp text: draw on integer coords and keep it small.
+  function label(str, x, y){
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = C.ink;
+    ctx.font = "bold 8px system-ui, Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(str, x, y);
+    ctx.restore();
+  }
 
-function clear(){
-  ctx.fillStyle = C.white;
-  ctx.fillRect(0,0,W,H);
-}
-
-function px(x,y,w=1,h=1,color=C.ink){
-  ctx.fillStyle = color;
-  ctx.fillRect(x,y,w,h);
-}
-
-function rectOutline(x,y,w,h,color=C.ink){
-  // 1px outline
-  for(let i=0;i<w;i++){ px(x+i,y,1,1,color); px(x+i,y+h-1,1,1,color); }
-  for(let j=0;j<h;j++){ px(x,y+j,1,1,color); px(x+w-1,y+j,1,1,color); }
-}
-
-function textMono(str,x,y,size=1){
-  // tiny pixel text: very simple (blocky)
-  // We'll draw via ctx.fillText but on pixel canvas it still looks pixelated.
-  ctx.fillStyle = C.ink;
-  ctx.font = `${6*size}px system-ui, Arial`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(str, x, y);
-  ctx.textAlign = "left";
-}
-
-function heart(x,y,color=C.gray){
-  // cute pixel heart 7x6
-  const p = [
-    "01100110",
-    "11111111",
-    "11111111",
-    "01111110",
-    "00111100",
-    "00011000",
-  ];
-  for(let j=0;j<p.length;j++){
-    for(let i=0;i<p[j].length;i++){
-      if(p[j][i]==="1") px(x+i,y+j,1,1,color);
+  function heart(x,y,color=C.gray){
+    const p = [
+      "01100110",
+      "11111111",
+      "11111111",
+      "01111110",
+      "00111100",
+      "00011000",
+    ];
+    for(let j=0;j<p.length;j++){
+      for(let i=0;i<p[j].length;i++){
+        if(p[j][i]==="1") px(x+i,y+j,1,1,color);
+      }
     }
   }
-}
 
-function drawYou(x,y){
-  // Cute chibi sprite 18x28-ish
-  // head
-  for(let j=0;j<10;j++) for(let i=0;i<10;i++) px(x+4+i,y+1+j,1,1,C.skin1);
-  // hair shaggy
-  for(let i=0;i<12;i++) px(x+3+i,y,1,1,C.hairYou);
-  px(x+2,y+1,1,2,C.hairYou); px(x+15,y+1,1,2,C.hairYou);
-  px(x+5,y-1,1,1,C.hairYou); px(x+8,y-2,1,1,C.hairYou); px(x+11,y-1,1,1,C.hairYou);
-  // eyes
-  px(x+6,y+5,1,1,C.ink); px(x+10,y+5,1,1,C.ink);
-  px(x+6,y+6,1,1,C.white); px(x+10,y+6,1,1,C.white);
-  // blush
-  px(x+5,y+7,1,1,C.blush); px(x+11,y+7,1,1,C.blush);
-  // smile
-  px(x+7,y+8,4,1,C.ink);
+  // ====== Characters (pixel sprites) ======
 
-  // hoodie (green plaid)
-  for(let j=0;j<9;j++) for(let i=0;i<12;i++) px(x+3+i,y+11+j,1,1,C.hoodie);
-  // plaid lines
-  for(let i=0;i<12;i++){ px(x+3+i,y+14,1,1,C.hoodie2); px(x+3+i,y+17,1,1,C.hoodie2); }
-  for(let j=0;j<9;j++){ px(x+6,y+11+j,1,1,C.hoodie2); px(x+9,y+11+j,1,1,C.hoodie2); }
-  // zipper
-  for(let j=0;j<9;j++) px(x+8,y+11+j,1,1,C.ink);
+  function drawYou(x,y){
+    // 18x30-ish
+    // head
+    for(let j=0;j<10;j++) for(let i=0;i<10;i++) px(x+4+i,y+1+j,1,1,C.skinYou);
 
-  // arms
-  for(let j=0;j<6;j++) px(x+2,y+12+j,1,1,C.hoodie);
-  for(let j=0;j<6;j++) px(x+15,y+12+j,1,1,C.hoodie);
-  // hands
-  px(x+2,y+18,1,2,C.skin1);
-  px(x+15,y+18,1,2,C.skin1);
+    // shaggy hair
+    for(let i=0;i<12;i++) px(x+3+i,y,1,1,C.hairYou);
+    px(x+2,y+1,1,3,C.hairYou); px(x+15,y+1,1,3,C.hairYou);
+    px(x+5,y-1,1,1,C.hairYou); px(x+8,y-2,1,1,C.hairYou); px(x+11,y-1,1,1,C.hairYou);
+    px(x+6,y+1,1,1,C.hairYou); px(x+9,y+1,1,1,C.hairYou); // extra shag
 
-  // pants
-  for(let j=0;j<8;j++) for(let i=0;i<6;i++) px(x+6+i,y+20+j,1,1,C.pants);
-  // shoes
-  for(let i=0;i<4;i++) px(x+5+i,y+28,1,1,C.ink);
-  for(let i=0;i<4;i++) px(x+9+i,y+28,1,1,C.ink);
+    // eyes
+    px(x+6,y+5,1,1,C.ink); px(x+10,y+5,1,1,C.ink);
+    px(x+6,y+6,1,1,C.white); px(x+10,y+6,1,1,C.white);
 
-  // tiny chain dots
-  px(x+5,y+21,1,1,"#777"); px(x+4,y+22,1,1,"#777"); px(x+3,y+23,1,1,"#777");
-}
+    // blush
+    px(x+5,y+7,1,1,C.blush); px(x+11,y+7,1,1,C.blush);
 
-function drawHer(x,y){
-  // Cute chibi sprite 18x30-ish, long hair + black outfit
-  // hair block behind
-  for(let j=0;j<16;j++) for(let i=0;i<14;i++) px(x+2+i,y+j,1,1,C.hairHer);
-
-  // face (visible!)
-  for(let j=0;j<10;j++) for(let i=0;i<10;i++) px(x+4+i,y+3+j,1,1,C.skin2);
-
-  // hair fringe
-  for(let i=0;i<10;i++) px(x+4+i,y+2,1,1,C.hairHer);
-
-  // eyes
-  px(x+6,y+7,1,1,C.ink); px(x+10,y+7,1,1,C.ink);
-  px(x+6,y+8,1,1,C.white); px(x+10,y+8,1,1,C.white);
-
-  // lips
-  px(x+7,y+10,4,1,C.ink);
-
-  // top (black)
-  for(let j=0;j<9;j++) for(let i=0;i<12;i++) px(x+3+i,y+14+j,1,1,C.ink);
-  // lace specks (super minimal)
-  px(x+5,y+16,1,1,C.white); px(x+9,y+18,1,1,C.white); px(x+12,y+17,1,1,C.white);
-
-  // arms
-  for(let j=0;j<6;j++) px(x+2,y+15+j,1,1,C.ink);
-  for(let j=0;j<6;j++) px(x+15,y+15+j,1,1,C.ink);
-  // hands
-  px(x+2,y+21,1,2,C.skin2);
-  px(x+15,y+21,1,2,C.skin2);
-
-  // skirt
-  for(let j=0;j<7;j++) for(let i=0;i<10;i++) px(x+4+i,y+23+j,1,1,C.ink);
-
-  // legs
-  for(let j=0;j<7;j++) px(x+6,y+30+j,1,1,C.pants);
-  for(let j=0;j<7;j++) px(x+10,y+30+j,1,1,C.pants);
-
-  // shoes
-  for(let i=0;i<4;i++) px(x+5+i,y+37,1,1,C.ink);
-  for(let i=0;i<4;i++) px(x+9+i,y+37,1,1,C.ink);
-
-  // earrings (tiny)
-  px(x+4,y+9,1,2,C.ink);
-  px(x+13,y+9,1,2,C.ink);
-}
-
-function drawKiki(x,y,crying=false){
-  // Cute round cactus in pot (approx 26x28)
-  // pot
-  for(let j=0;j<7;j++) for(let i=0;i<26;i++) px(x+i,y+21+j,1,1,C.pot);
-  for(let i=0;i<26;i++) px(x+i,y+21,1,1,C.potHi);
-
-  // cactus round
-  const r = 12;
-  for(let dy=-r; dy<=r; dy++){
-    for(let dx=-r; dx<=r; dx++){
-      if(dx*dx + dy*dy <= r*r) px(x+13+dx, y+10+dy, 1,1, C.cactus);
-    }
-  }
-  // highlights
-  px(x+10,y+6,1,1,C.cactusHi);
-  px(x+16,y+8,1,1,C.cactusHi);
-  px(x+12,y+14,1,1,C.cactusHi);
-
-  // spines
-  px(x+13,y-1,1,2,C.cactusHi);
-  px(x+3,y+9,2,1,C.cactusHi);
-  px(x+21,y+9,2,1,C.cactusHi);
-  px(x+6,y+16,2,1,C.cactusHi);
-  px(x+18,y+16,2,1,C.cactusHi);
-
-  // face
-  px(x+10,y+10,2,2,C.ink);
-  px(x+16,y+10,2,2,C.ink);
-
-  if(crying){
-    // sad mouth
-    px(x+11,y+17,6,1,C.ink);
-    px(x+11,y+16,1,1,C.ink);
-    px(x+16,y+16,1,1,C.ink);
-    // tears
-    for(let j=0;j<6;j++) px(x+9,y+12+j,1,1,C.tear);
-    for(let j=0;j<6;j++) px(x+19,y+12+j,1,1,C.tear);
-  }else{
     // smile
-    px(x+11,y+17,6,1,C.ink);
-    px(x+12,y+16,4,1,C.ink);
+    px(x+7,y+8,4,1,C.ink);
+
+    // hoodie
+    for(let j=0;j<9;j++) for(let i=0;i<12;i++) px(x+3+i,y+11+j,1,1,C.hoodie);
+
+    // plaid
+    for(let i=0;i<12;i++){ px(x+3+i,y+14,1,1,C.hoodie2); px(x+3+i,y+17,1,1,C.hoodie2); }
+    for(let j=0;j<9;j++){ px(x+6,y+11+j,1,1,C.hoodie2); px(x+9,y+11+j,1,1,C.hoodie2); }
+
+    // zipper
+    for(let j=0;j<9;j++) px(x+8,y+11+j,1,1,C.ink);
+
+    // arms + hands
+    for(let j=0;j<6;j++) px(x+2,y+12+j,1,1,C.hoodie);
+    for(let j=0;j<6;j++) px(x+15,y+12+j,1,1,C.hoodie);
+    px(x+2,y+18,1,2,C.skinYou);
+    px(x+15,y+18,1,2,C.skinYou);
+
+    // pants
+    for(let j=0;j<9;j++) for(let i=0;i<6;i++) px(x+6+i,y+20+j,1,1,C.pants);
+
+    // shoes
+    for(let i=0;i<4;i++) px(x+5+i,y+29,1,1,C.ink);
+    for(let i=0;i<4;i++) px(x+9+i,y+29,1,1,C.ink);
+
+    // tiny chain
+    px(x+5,y+21,1,1,"#777"); px(x+4,y+22,1,1,"#777"); px(x+3,y+23,1,1,"#777");
   }
-}
 
-function sprinkleSpines(x1,y1,x2,y2,count){
-  for(let i=0;i<count;i++){
-    const x = Math.floor(x1 + Math.random()*(x2-x1));
-    const y = Math.floor(y1 + Math.random()*(y2-y1));
-    px(x,y,1,1,C.cactusHi);
+  function drawHer(x,y,scale=0.85){
+    // Draw “her” smaller by rendering to an offscreen mini-grid
+    // We’ll manually scale by stepping pixels.
+    const base = [];
+
+    function bpx(ix,iy,color){
+      base.push([ix,iy,color]);
+    }
+
+    // Build a 18x38-ish sprite into base coords
+    // hair background (long)
+    for(let j=0;j<16;j++) for(let i=0;i<14;i++) bpx(2+i,j,C.hairHer);
+
+    // face
+    for(let j=0;j<10;j++) for(let i=0;i<10;i++) bpx(4+i,3+j,C.skinHer);
+
+    // fringe
+    for(let i=0;i<10;i++) bpx(4+i,2,C.hairHer);
+
+    // eyes
+    bpx(6,7,C.ink); bpx(10,7,C.ink);
+    bpx(6,8,C.white); bpx(10,8,C.white);
+
+    // cheeks
+    bpx(5,9,C.blush); bpx(11,9,C.blush);
+
+    // lips
+    bpx(7,10,C.ink); bpx(8,10,C.ink); bpx(9,10,C.ink); bpx(10,10,C.ink);
+
+    // top (black)
+    for(let j=0;j<9;j++) for(let i=0;i<12;i++) bpx(3+i,14+j,C.ink);
+
+    // tiny lace dots
+    bpx(5,16,C.white); bpx(9,18,C.white); bpx(12,17,C.white);
+
+    // arms
+    for(let j=0;j<6;j++) bpx(2,15+j,C.ink);
+    for(let j=0;j<6;j++) bpx(15,15+j,C.ink);
+
+    // hands
+    bpx(2,21,C.skinHer); bpx(2,22,C.skinHer);
+    bpx(15,21,C.skinHer); bpx(15,22,C.skinHer);
+
+    // skirt
+    for(let j=0;j<7;j++) for(let i=0;i<10;i++) bpx(4+i,23+j,C.ink);
+
+    // legs
+    for(let j=0;j<7;j++) bpx(6,30+j,C.pants);
+    for(let j=0;j<7;j++) bpx(10,30+j,C.pants);
+
+    // shoes
+    for(let i=0;i<4;i++) bpx(5+i,37,C.ink);
+    for(let i=0;i<4;i++) bpx(9+i,37,C.ink);
+
+    // earrings
+    bpx(4,9,C.ink); bpx(4,10,C.ink);
+    bpx(13,9,C.ink); bpx(13,10,C.ink);
+
+    // Render scaled pixels (nearest-neighbor) at integer positions
+    const s = scale;
+    for(const [ix,iy,color] of base){
+      const sx = Math.round(x + ix*s);
+      const sy = Math.round(y + iy*s);
+      const sw = Math.max(1, Math.round(s));
+      const sh = Math.max(1, Math.round(s));
+      // Better: draw at size 1 but spread by scale via duplicates:
+      // We'll draw a tiny block of size ceil(scale) to keep visibility.
+      px(sx, sy, sw, sh, color);
+    }
   }
-}
 
-let scene = "ASK";
-let noCount = 0;
+  function drawKiki(x,y,crying=false,happy=false){
+    // 26x28 approx
+    // pot
+    for(let j=0;j<7;j++) for(let i=0;i<26;i++) px(x+i,y+21+j,1,1,C.pot);
+    for(let i=0;i<26;i++) px(x+i,y+21,1,1,C.potHi);
 
-function drawAsk(){
-  clear();
-  // inner border
-  rectOutline(2,2,W-4,H-4,C.ink);
+    // cactus round
+    const r = 12;
+    for(let dy=-r; dy<=r; dy++){
+      for(let dx=-r; dx<=r; dx++){
+        if(dx*dx + dy*dy <= r*r) px(x+13+dx, y+10+dy, 1,1, C.cactus);
+      }
+    }
 
-  // title box inside canvas
-  rectOutline(50,6,60,12,C.ink);
-  // fill
-  for(let j=7;j<17;j++) for(let i=51;i<109;i++) px(i,j,1,1,C.white);
-  textMono("BE MY VALENTINE?", 80, 12, 1);
+    // highlights/spines
+    px(x+10,y+6,1,1,C.cactusHi);
+    px(x+16,y+8,1,1,C.cactusHi);
+    px(x+12,y+14,1,1,C.cactusHi);
 
-  heart(18,20,C.gray);
-  heart(132,20,C.gray);
+    px(x+13,y-1,1,2,C.cactusHi);
+    px(x+3,y+9,2,1,C.cactusHi);
+    px(x+21,y+9,2,1,C.cactusHi);
+    px(x+6,y+16,2,1,C.cactusHi);
+    px(x+18,y+16,2,1,C.cactusHi);
 
-  drawYou(38,26);
-  drawHer(112,20);
+    // face
+    px(x+10,y+10,2,2,C.ink);
+    px(x+16,y+10,2,2,C.ink);
 
-  // cute center kiki (watching)
-  drawKiki(67,42,false);
-}
+    if(crying){
+      // sad mouth + tears
+      px(x+11,y+17,6,1,C.ink);
+      px(x+11,y+16,1,1,C.ink);
+      px(x+16,y+16,1,1,C.ink);
+      for(let j=0;j<6;j++) px(x+9,y+12+j,1,1,C.tear);
+      for(let j=0;j<6;j++) px(x+19,y+12+j,1,1,C.tear);
+    } else if(happy){
+      // big happy smile
+      px(x+11,y+17,6,1,C.ink);
+      px(x+12,y+16,4,1,C.ink);
+      px(x+12,y+15,1,1,C.ink);
+      px(x+15,y+15,1,1,C.ink);
+      // sparkle cheeks
+      px(x+8,y+13,1,1,C.white);
+      px(x+21,y+13,1,1,C.white);
+    } else {
+      // normal smile
+      px(x+11,y+17,6,1,C.ink);
+      px(x+12,y+16,4,1,C.ink);
+    }
+  }
 
-function drawNo(){
-  clear();
-  rectOutline(2,2,W-4,H-4,C.ink);
-  textMono("KIKI WILL BE SAD...", 80, 10, 1);
-  heart(18,20,C.gray);
-  heart(132,20,C.gray);
+  function sprinkle(x1,y1,x2,y2,count,color=C.cactusHi){
+    for(let i=0;i<count;i++){
+      const x = (x1 + Math.floor(Math.random()*(x2-x1+1)));
+      const y = (y1 + Math.floor(Math.random()*(y2-y1+1)));
+      px(x,y,1,1,color);
+    }
+  }
 
-  drawKiki(67,26,true);
+  // ====== Scenes ======
+  let scene = "ASK";
+  let noCount = 0;
 
-  // little wobble marks
-  px(52,26,2,1,C.ink); px(54,24,1,2,C.ink);
-  px(108,26,2,1,C.ink); px(106,24,1,2,C.ink);
-}
+  function drawAsk(){
+    clear();
+    outline(1,1,W-2,H-2,C.ink);
 
-function drawYes(){
-  clear();
-  rectOutline(2,2,W-4,H-4,C.ink);
-  textMono("YAYYYY!!!", 80, 10, 1);
-  heart(18,20,C.gray);
-  heart(132,20,C.gray);
+    // speech box (pixel)
+    outline(50,5,60,12,C.ink);
+    label("BE MY VALENTINE?", 80, 11);
 
-  // hugging pose (closer together)
-  drawYou(46,22);
-  drawHer(94,18);
+    heart(16,18,C.gray);
+    heart(136,18,C.gray);
 
-  // kiki between them
-  drawKiki(67,40,false);
+    drawYou(40,24);
+    // Her smaller than you
+    drawHer(112,20,0.8);
 
-  // spines on both (cute chaos)
-  sprinkleSpines(44,40,62,64,18);   // on you
-  sprinkleSpines(98,40,116,64,18);  // on her
-}
+    // Kiki watching in the middle bottom (small)
+    drawKiki(67,44,false,false);
+  }
 
-function render(){
-  if(scene==="ASK") drawAsk();
-  if(scene==="NO") drawNo();
-  if(scene==="YES") drawYes();
-}
-render();
+  function drawNo(){
+    clear();
+    outline(1,1,W-2,H-2,C.ink);
+    label("KIKI WILL BE SAD...", 80, 10);
+    heart(16,18,C.gray);
+    heart(136,18,C.gray);
 
-/* interactions */
-const noLines = [
-  "Kiki will be sad...",
-  "Kiki is sadder...",
-  "Kiki is CRYING now 😭",
-  "pls don’t do this to Kiki...",
-  "Kiki is inconsolable...",
-  "ok that’s enough 😭"
-];
+    drawKiki(67,26,true,false);
 
-noBtn.addEventListener("click", () => {
-  scene = "NO";
-  noCount++;
-  title.textContent = "you clicked NO 😭";
-  subtitle.textContent = "";
-  statusEl.textContent = noLines[Math.min(noCount-1, noLines.length-1)];
+    // shake marks
+    px(50,28,2,1,C.ink); px(52,26,1,2,C.ink);
+    px(108,28,2,1,C.ink); px(106,26,1,2,C.ink);
+  }
+
+  function drawYes(){
+    clear();
+    outline(1,1,W-2,H-2,C.ink);
+    label("YAYYY!!", 80, 10);
+    heart(16,18,C.gray);
+    heart(136,18,C.gray);
+
+    // Hug pose: bring them close, arms around
+    // You (left)
+    drawYou(54,22);
+
+    // Add “hug arm” pixels from you to center
+    px(66,38,6,1,C.hoodie);
+    px(71,39,2,1,C.skinYou);
+
+    // Her (right, smaller)
+    drawHer(92,20,0.78);
+
+    // Add “hug arm” pixels from her to center (black sleeve)
+    px(90,40,6,1,C.ink);
+    px(88,41,2,1,C.skinHer);
+
+    // Happy Kiki in between, being held
+    drawKiki(67,42,false,true);
+
+    // Everyone happy: sparkles
+    sprinkle(10,8,150,70,22,C.white);
+
+    // Spines (cute chaos) — fewer so it looks happy
+    sprinkle(52,34,74,60,10,C.cactusHi);  // on you
+    sprinkle(92,34,114,60,8,C.cactusHi);  // on her
+  }
+
+  function render(){
+    ctx.imageSmoothingEnabled = false;
+    if(scene==="ASK") drawAsk();
+    if(scene==="NO") drawNo();
+    if(scene==="YES") drawYes();
+  }
   render();
 
-  // drift the NO button (still works with pixel vibe)
-  const max = Math.min(150, 10 + noCount * 12);
-  const dx = Math.round((Math.random()*2 - 1) * max);
-  const dy = Math.round((Math.random()*2 - 1) * (max * 0.25));
-  noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
-});
+  // ====== Interactions ======
+  const noLines = [
+    "Kiki will be sad...",
+    "Kiki is sadder...",
+    "Kiki is CRYING now 😭",
+    "pls don’t do this to Kiki...",
+    "Kiki is inconsolable...",
+    "ok that’s enough 😭"
+  ];
 
-yesBtn.addEventListener("click", () => {
-  scene = "YES";
-  title.textContent = "SHE SAID YES 💘";
-  subtitle.textContent = "";
-  statusEl.textContent = "";
-  render();
+  noBtn.addEventListener("click", () => {
+    scene = "NO";
+    noCount++;
 
-  yesBtn.disabled = true;
-  noBtn.disabled = true;
-  yesBtn.style.opacity = 0.65;
-  noBtn.style.opacity = 0.65;
-  noBtn.style.transform = "none";
-});
+    title.textContent = "you clicked NO 😭";
+    subtitle.textContent = "";
+    statusEl.textContent = noLines[Math.min(noCount-1, noLines.length-1)];
+    render();
+
+    // drift NO button
+    const max = Math.min(150, 10 + noCount * 12);
+    const dx = Math.round((Math.random()*2 - 1) * max);
+    const dy = Math.round((Math.random()*2 - 1) * (max * 0.25));
+    noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+
+  yesBtn.addEventListener("click", () => {
+    scene = "YES";
+    title.textContent = "SHE SAID YES 💘";
+    subtitle.textContent = "";
+    statusEl.textContent = "HUG TIME!! Everyone is happy 😭💘🌵";
+    render();
+
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+    yesBtn.style.opacity = 0.65;
+    noBtn.style.opacity = 0.65;
+    noBtn.style.transform = "none";
+  });
 </script>
 </body>
 </html>
