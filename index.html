@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine?</title>
+  <style>
+    :root{
+      --bg:#000;
+      --paper:#fff;
+      --ink:#111;
+      --border:#000;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .paper{
+      width:min(860px, 94vw);
+      background:var(--paper);
+      border:10px solid var(--border);
+      padding:18px 18px 22px;
+    }
+    .top{
+      min-height:440px;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+    .caption{
+      position:absolute;
+      top:10px; left:10px; right:10px;
+      font-size:22px;
+      font-weight:800;
+      text-align:center;
+      letter-spacing:.2px;
+      color:var(--ink);
+    }
+    .hint{
+      position:absolute;
+      top:46px; left:10px; right:10px;
+      font-size:14px;
+      text-align:center;
+      opacity:.7;
+      color:var(--ink);
+    }
+    .art{
+      width:min(620px, 92%);
+      height:auto;
+    }
+
+    .buttons{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+      padding:0 40px 8px;
+    }
+    button{
+      border:6px solid #000;
+      background:#fff;
+      padding:18px 10px;
+      font-size:28px;
+      font-weight:900;
+      cursor:pointer;
+      letter-spacing:.8px;
+      color:#000;
+    }
+    button:active{ transform: translateY(2px); }
+    .status{
+      margin-top:8px;
+      text-align:center;
+      font-size:16px;
+      font-weight:700;
+      min-height:24px;
+      color:#000;
+    }
+    .tiny{
+      font-size:12px;
+      opacity:.65;
+      text-align:center;
+      margin-top:6px;
+      color:#000;
+    }
+  </style>
+</head>
+<body>
+  <div class="paper">
+    <div class="top">
+      <div class="caption" id="caption">Will you be my Valentine?</div>
+      <div class="hint" id="hint">click yes or no ↓</div>
+
+      <!-- ============ SCENE: ASK (cleaned-up version of your outline) ============ -->
+      <svg id="sceneAsk" class="art" viewBox="0 0 700 380" aria-label="doodle ask scene">
+        <rect x="0" y="0" width="700" height="380" fill="#fff"/>
+
+        <!-- hearts -->
+        <g fill="none" stroke="#111" stroke-width="5" stroke-linecap="round">
+          <path d="M110 70 C95 50, 65 55, 70 80 C75 110, 110 120, 110 145 C110 120, 150 110, 155 80 C160 55, 130 50, 110 70"/>
+          <path d="M590 80 C575 60, 545 65, 550 90 C555 120, 590 130, 590 155 C590 130, 630 120, 635 90 C640 65, 610 60, 590 80"/>
+        </g>
+
+        <!-- YOU (left): hoodie + pants + big shoes, goofy face -->
+        <g fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <!-- head -->
+          <circle cx="210" cy="110" r="55"/>
+
+          <!-- hair: scribbly but cleaner -->
+          <path d="M158 100
+                   C165 65, 205 48, 250 62
+                   C275 72, 278 100, 265 112
+                   C255 125, 235 132, 210 132
+                   C185 132, 165 125, 158 100"/>
+          <path d="M165 70 L175 90 M180 62 L190 88 M198 58 L205 86 M217 58 L220 88 M236 62 L230 90 M252 70 L240 95"/>
+
+          <!-- face (eyes + smile) -->
+          <ellipse cx="190" cy="110" rx="10" ry="7"/>
+          <ellipse cx="230" cy="110" rx="10" ry="7"/>
+          <path d="M190 110 L195 110"/>
+          <path d="M230 110 L235 110"/>
+          <path d="M190 132 C205 145, 225 145, 242 132"/>
+          <path d="M200 136 L212 136"/>
+
+          <!-- hoodie neck -->
+          <path d="M175 162 C195 150, 225 150, 245 162"/>
+          <!-- hoodie body -->
+          <path d="M165 165 C155 210, 158 260, 172 285"/>
+          <path d="M255 165 C265 210, 262 260, 248 285"/>
+          <path d="M172 285 C205 300, 230 300, 248 285"/>
+
+          <!-- hoodie strings -->
+          <path d="M205 175 L205 230"/>
+          <path d="M225 175 L225 230"/>
+          <circle cx="205" cy="240" r="4"/>
+          <circle cx="225" cy="240" r="4"/>
+
+          <!-- arms -->
+          <path d="M170 210 C150 235, 150 255, 162 270"/>
+          <path d="M250 210 C270 235, 270 255, 258 270"/>
+
+          <!-- pants -->
+          <path d="M190 300 L188 345"/>
+          <path d="M230 300 L232 345"/>
+          <path d="M188 345 C180 360, 180 365, 190 365"/>
+          <path d="M232 345 C240 360, 240 365, 230 365"/>
+
+          <!-- big shoes -->
+          <path d="M165 365 C185 378, 205 378, 215 365"/>
+          <path d="M205 365 C225 378, 250 378, 260 365"/>
+        </g>
+
+        <!-- HER (right): long hair, simple body like your sketch -->
+        <g fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <!-- head -->
+          <circle cx="510" cy="120" r="62"/>
+
+          <!-- long hair outline -->
+          <path d="M455 105 C460 60, 565 60, 570 110"/>
+          <path d="M448 115 C450 200, 470 250, 495 270"/>
+          <path d="M575 115 C572 200, 555 250, 528 270"/>
+
+          <!-- inner hair strands -->
+          <path d="M560 130 C555 200, 555 230, 548 260"/>
+          <path d="M475 130 C480 200, 480 230, 490 260"/>
+
+          <!-- eyes + mouth -->
+          <path d="M482 120 C495 112, 508 112, 520 120"/>
+          <path d="M520 120 C533 112, 546 112, 558 120"/>
+          <path d="M500 145 L540 145"/>
+
+          <!-- stick body -->
+          <path d="M510 185 L510 290"/>
+          <path d="M510 220 L470 250"/>
+          <path d="M510 220 L550 250"/>
+          <path d="M510 290 L475 340"/>
+          <path d="M510 290 L560 340"/>
+        </g>
+
+        <!-- title scribble -->
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="900">
+          <text x="350" y="35" font-size="22" text-anchor="middle">BE MY VALENTINE??</text>
+        </g>
+      </svg>
+
+      <!-- ============ SCENE: NO (Kiki crying) ============ -->
+      <svg id="sceneNo" class="art" viewBox="0 0 700 380" aria-label="kiki crying" style="display:none;">
+        <rect x="0" y="0" width="700" height="380" fill="#fff"/>
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="900">
+          <text x="350" y="55" font-size="30" text-anchor="middle">KIKI WILL BE SAD…</text>
+        </g>
+
+        <g fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <!-- pot -->
+          <path d="M260 280 L440 280 L420 350 L280 350 Z"/>
+          <path d="M250 280 L450 280"/>
+          <!-- cactus -->
+          <circle cx="350" cy="185" r="90"/>
+
+          <!-- many spines -->
+          <path d="M350 95 L350 75"/>
+          <path d="M390 105 L405 90"/>
+          <path d="M310 105 L295 90"/>
+          <path d="M435 145 L455 140"/>
+          <path d="M265 145 L245 140"/>
+          <path d="M420 205 L440 215"/>
+          <path d="M280 205 L260 215"/>
+          <path d="M395 250 L410 270"/>
+          <path d="M305 250 L290 270"/>
+
+          <!-- face -->
+          <path d="M320 175 L320 175"/>
+          <path d="M380 175 L380 175"/>
+          <path d="M330 225 C350 205, 370 205, 390 225"/>
+
+          <!-- tears -->
+          <path d="M310 190 L295 235"/>
+          <path d="M390 190 L405 235"/>
+        </g>
+      </svg>
+
+      <!-- ============ SCENE: YES (both holding Kiki + spines everywhere) ============ -->
+      <svg id="sceneYes" class="art" viewBox="0 0 700 380" aria-label="both holding kiki" style="display:none;">
+        <rect x="0" y="0" width="700" height="380" fill="#fff"/>
+        <g fill="#111" font-family="system-ui,Segoe UI,Arial" font-weight="900">
+          <text x="350" y="55" font-size="30" text-anchor="middle">SHE SAID YESSS 💘</text>
+        </g>
+
+        <g fill="none" stroke="#111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <!-- her head -->
+          <circle cx="260" cy="140" r="55"/>
+          <path d="M210 135 C215 95, 305 95, 310 140"/>
+          <path d="M205 145 C205 210, 225 245, 250 265"/>
+          <path d="M315 145 C315 210, 300 245, 275 265"/>
+          <rect x="235" y="135" width="25" height="18"/>
+          <rect x="265" y="135" width="25" height="18"/>
+
+          <!-- your head -->
+          <circle cx="440" cy="135" r="60"/>
+          <path d="M390 130 C400 90, 485 90, 495 130"/>
+          <path d="M395 105 L410 130 M425 95 L430 125 M455 95 L450 125 M485 105 L470 132"/>
+
+          <!-- bodies -->
+          <path d="M260 195 L260 300"/>
+          <path d="M440 195 L440 305"/>
+
+          <!-- hugging / holding kiki -->
+          <path d="M260 225 C305 245, 330 255, 350 255"/>
+          <path d="M440 225 C395 245, 370 255, 350 255"/>
+
+          <!-- Kiki (middle) -->
+          <circle cx="350" cy="240" r="55"/>
+          <path d="M320 295 L380 295 L372 335 L328 335 Z"/>
+
+          <!-- Kiki face -->
+          <path d="M335 235 L335 235"/>
+          <path d="M365 235 L365 235"/>
+          <path d="M340 255 C350 262, 360 262, 370 255"/>
+
+          <!-- spines on both of you -->
+          <path d="M230 210 L215 205"/>
+          <path d="M245 235 L230 230"/>
+          <path d="M275 245 L268 235"/>
+          <path d="M295 225 L310 220"/>
+
+          <path d="M420 210 L405 205"/>
+          <path d="M445 235 L430 230"/>
+          <path d="M470 245 L462 235"/>
+          <path d="M495 225 L510 220"/>
+
+          <!-- spines on kiki -->
+          <path d="M350 185 L350 168"/>
+          <path d="M380 195 L395 185"/>
+          <path d="M320 195 L305 185"/>
+          <path d="M405 240 L420 240"/>
+          <path d="M295 240 L280 240"/>
+        </g>
+
+        <!-- hearts -->
+        <g fill="none" stroke="#111" stroke-width="5" stroke-linecap="round">
+          <path d="M120 90 C105 70, 75 75, 80 100 C85 130, 120 140, 120 165 C120 140, 160 130, 165 100 C170 75, 140 70, 120 90"/>
+          <path d="M590 95 C575 75, 545 80, 550 105 C555 135, 590 145, 590 170 C590 145, 630 135, 635 105 C640 80, 610 75, 590 95"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="buttons">
+      <button id="yesBtn">YES</button>
+      <button id="noBtn">NO</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="tiny">handmade doodle website</div>
+  </div>
+
+  <script>
+    const kikiName = "Kiki";
+
+    const caption = document.getElementById("caption");
+    const hint = document.getElementById("hint");
+    const status = document.getElementById("status");
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+
+    const sceneAsk = document.getElementById("sceneAsk");
+    const sceneNo  = document.getElementById("sceneNo");
+    const sceneYes = document.getElementById("sceneYes");
+
+    let noClicks = 0;
+    const noLines = [
+      `${kikiName} will be sad...`,
+      `${kikiName} is sadder...`,
+      `${kikiName} is crying now...`,
+      `${kikiName} is so sad omg...`,
+      `${kikiName}: "why???"`,
+      `PLEASE 😭`,
+      `ok this is bullying 😭`,
+      `kiki is literally sobbing`,
+    ];
+
+    function showScene(which){
+      sceneAsk.style.display = "none";
+      sceneNo.style.display = "none";
+      sceneYes.style.display = "none";
+      if(which === "ask") sceneAsk.style.display = "block";
+      if(which === "no")  sceneNo.style.display = "block";
+      if(which === "yes") sceneYes.style.display = "block";
+    }
+
+    noBtn.addEventListener("click", () => {
+      noClicks++;
+      showScene("no");
+      caption.textContent = "pls don't do this 😭";
+      hint.textContent = "";
+      status.textContent = noLines[Math.min(noClicks - 1, noLines.length - 1)];
+
+      // drift the NO button a bit
+      const max = Math.min(120, 10 + noClicks * 9);
+      const dx = Math.round((Math.random()*2 - 1) * max);
+      const dy = Math.round((Math.random()*2 - 1) * (max * 0.35));
+      noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+
+    yesBtn.addEventListener("click", () => {
+      showScene("yes");
+      caption.textContent = `YAYYYY 💘`;
+      hint.textContent = "";
+      status.textContent = `we're both holding ${kikiName}… and we're both covered in cactus spines 😭🌵`;
+
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      yesBtn.style.opacity = 0.6;
+      noBtn.style.opacity = 0.6;
+      noBtn.style.transform = "none";
+    });
+  </script>
+</body>
+</html>
